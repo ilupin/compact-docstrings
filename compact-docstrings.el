@@ -47,10 +47,14 @@
   :group 'compact-docstrings
   :type 'boolean)
 
+(defvar-local compact-all-blank-lines t)
+
 (defun compact-docstrings--matcher (bound)
   "Find blank line in docstring, looking in point .. BOUND."
   (let ((found nil))
     (while (and (not found) (re-search-forward "^\n" bound t))
+      (setq found compact-all-blank-lines)
+      (unless found
       (let ((syntax (syntax-ppss)))
         (when (and (or (nth 3 syntax)  ;; In string
                        (nth 4 syntax)) ;; In comment
@@ -58,7 +62,7 @@
                        (let ((face (get-text-property (point) 'face)))
                          (or (eq face 'font-lock-doc-face)
                              (and (listp face) (memq 'font-lock-doc-face face))))))
-          (setq found t))))
+          (setq found t)))))
     found))
 
 (defconst compact-docstrings--keywords
